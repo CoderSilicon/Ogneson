@@ -1,6 +1,7 @@
 "use client";
 import { ELEMENTS, CATEGORY_COLORS } from "@/data/elements";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation"; // Added hook
 
 interface ElementCardProps {
   element: {
@@ -13,10 +14,12 @@ interface ElementCardProps {
     col: number;
   };
   colorClass: string;
+  isDimmed?: boolean; // Added optional dim state
 }
-function ElementCard({ element, colorClass }: ElementCardProps) {
+
+function ElementCard({ element, colorClass, isDimmed }: ElementCardProps) {
   return (
-    <Link href={`/element/${element.id}`} className="w-full">
+    <Link href={`/element/${element.id}`} className={`w-full transition-opacity duration-300 ${isDimmed ? "opacity-15 pointer-events-none" : "opacity-100"}`}>
       <div
         className={`
       w-full aspect-square
@@ -51,117 +54,73 @@ function ElementCard({ element, colorClass }: ElementCardProps) {
 }
 
 export default function PeriodicTable() {
+  const searchParams = useSearchParams();
+  const query = searchParams.get("search")?.toLowerCase() || "";
+
+  // Helper to determine if an element matches our filter
+  const matchesSearch = (element: typeof ELEMENTS[0]) => {
+    if (!query) return true;
+    return (
+      element.name.toLowerCase().includes(query) ||
+      element.symbol.toLowerCase().includes(query) ||
+      element.number.toString().includes(query)
+    );
+  };
+
   return (
     <>
       <div className="min-h-screen p-2 md:p-4 lg:p-8">
-        {/* <div className="hidden md:block">
-          <div className="relative w-[500px] h-[400px]  flex items-center justify-center font-sans overflow-hidden">
-            <svg
-              className="absolute inset-0 w-full h-full pointer-events-none"
-              viewBox="0 0 500 400"
-            >
-              <path
-                d="M 100 80 L 190 140"
-                stroke="#475569"
-                strokeDasharray="4"
-                fill="none"
-              />
-              <path
-                d="M 400 150 L 310 180"
-                stroke="#475569"
-                strokeDasharray="4"
-                fill="none"
-              />
-              <path
-                d="M 100 320 L 190 260"
-                stroke="#475569"
-                strokeDasharray="4"
-                fill="none"
-              />
-            </svg>
-
-
-            <div className="absolute top-16 left-8 text-right">
-              <p className="text-[10px] text-slate-500 uppercase tracking-widest">
-                .01
-              </p>
-              <p className="text-black font-bold text-sm">ATOMIC NUMBER</p>
-            </div>
-
-            <div className="absolute top-32 right-8 text-left">
-              <p className="text-[10px] text-slate-500 uppercase tracking-widest">
-                Property.02
-              </p>
-              <p className="text-black font-bold text-sm">CHEMICAL SYMBOL</p>
-            </div>
-
-            <div className="absolute bottom-12 left-6 text-right">
-              <p className="text-[10px] text-slate-500 uppercase tracking-widest">
-                Property.03
-              </p>
-              <p className="text-black font-bold text-sm">ELEMENT NAME</p>
-            </div>
-
-
-            <div className="w-32 h-32 bg-[#d29a5e] p-3 shadow-2xl relative z-10 flex flex-col justify-between">
-              <span className="text-white font-bold text-xl">14</span>
-              <span className="text-white text-5xl font-black self-center">
-                Si
-              </span>
-              <div className="border-t border-white/30 pt-1">
-                <span className="text-white text-[10px] uppercase tracking-tighter">
-                  Silicon
-                </span>
-              </div>
-            </div>
-          </div>
-        </div> */}
-
         <div className="overflow-x-auto">
+          
+          {/* Mobile Layout: Completely filtered to save vertical space */}
           <div className="inline-grid gap-0.5 p-2 md:p-4 grid-cols-6 md:hidden ">
-            {ELEMENTS.map((element) => (
+            {ELEMENTS.filter(matchesSearch).map((element) => (
               <div key={element.id} className="md:hidden">
                 <ElementCard
                   element={element}
                   colorClass={
-                    CATEGORY_COLORS[
-                      element.category as keyof typeof CATEGORY_COLORS
-                    ] || "bg-gray-100 border-gray-400 text-gray-900"
+                    CATEGORY_COLORS[element.category as keyof typeof CATEGORY_COLORS] || 
+                    "bg-gray-100 border-gray-400 text-gray-900"
                   }
                 />
               </div>
             ))}
           </div>
 
+          {/* Desktop Layout: Dims non-matching elements to keep the periodic table shape intact! */}
           <div
             className="hidden md:inline-grid gap-0.5 p-4 "
             style={{
               gridTemplateColumns: "repeat(18, minmax(60px, 1fr))",
             }}
           >
-            {ELEMENTS.map((element) => (
-              <div
-                key={element.id}
-                style={{
-                  gridColumn: element.col,
-                  gridRow: element.row,
-                }}
-              >
-                <ElementCard
-                  element={element}
-                  colorClass={
-                    CATEGORY_COLORS[
-                      element.category as keyof typeof CATEGORY_COLORS
-                    ] || "bg-gray-100 border-gray-400 text-gray-900"
-                  }
-                />
-              </div>
-            ))}
+            {ELEMENTS.map((element) => {
+              const active = matchesSearch(element);
+              return (
+                <div
+                  key={element.id}
+                  style={{
+                    gridColumn: element.col,
+                    gridRow: element.row,
+                  }}
+                >
+                  <ElementCard
+                    element={element}
+                    isDimmed={!active}
+                    colorClass={
+                      CATEGORY_COLORS[element.category as keyof typeof CATEGORY_COLORS] || 
+                      "bg-gray-100 border-gray-400 text-gray-900"
+                    }
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
 
+        {/* Categories Section remains unchanged */}
         <div className="mt-8 md:mt-12 max-w-5xl mx-auto">
-          <div className="bg-white/80  p-4 md:p-6">
+          <div className="bg-white/80 p-4 md:p-6">
             <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2 lexend-400">
               Element Categories
             </h3>
@@ -169,9 +128,7 @@ export default function PeriodicTable() {
               {Object.entries(CATEGORY_COLORS).map(([category, colorClass]) => (
                 <Link href={`elementCatogories/${category}`} key={category}>
                   <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3">
-                    <div
-                      className={`w-5 h-5 md:w-6 md:h-6 ${colorClass} border border-white/20`}
-                    />
+                    <div className={`w-5 h-5 md:w-6 md:h-6 ${colorClass} border border-white/20`} />
                     <span className="text-xs md:text-sm text-gray-700 font-medium capitalize">
                       {category.replace("-", " ")}
                     </span>
