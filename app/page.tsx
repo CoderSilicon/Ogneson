@@ -5,7 +5,9 @@ import PeriodicTable from "@/components/periodic";
 export default function Home() {
   return (
     <>
-      <Header />
+      <Suspense fallback={<div className="h-24 bg-white base-pulse" />}>
+        <Header />
+      </Suspense>
       <div className="flex flex-col h-screen items-center justify-center bg-[#e4e2dd] font-sans text-black dark:bg-white">
         <Suspense
           fallback={<div className="text-center mt-10 text-lg">Loading...</div>}

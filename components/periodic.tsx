@@ -1,7 +1,7 @@
 "use client";
 import { ELEMENTS, CATEGORY_COLORS } from "@/data/elements";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation"; // Added hook
+import { useSearchParams } from "next/navigation"; 
 
 interface ElementCardProps {
   element: {
@@ -14,7 +14,7 @@ interface ElementCardProps {
     col: number;
   };
   colorClass: string;
-  isDimmed?: boolean; // Added optional dim state
+  isDimmed?: boolean; 
 }
 
 function ElementCard({ element, colorClass, isDimmed }: ElementCardProps) {
