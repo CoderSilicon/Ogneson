@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://siliconja.vercel.app/sitemap.xml
+Sitemap: https://ogneson.vercel.app/sitemap.xml

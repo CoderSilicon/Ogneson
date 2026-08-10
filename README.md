@@ -1,11 +1,11 @@
-![Silicønja](app/assets/logo.png)
-# Silicønja (ø3)
+![Ogneson](app/assets/logo.png)
+# Ogneson
 
 
 
 > **Small Map for All Chemical Elements**
 > 
-> **ø3** is a "by students, for students" web application. It acts as a **student-focused chemistry reference** designed to provide structured, accurate, and visual information for all **118 chemical elements**. 
+> **Ogneson** is a "by students, for students" web application. It acts as a **student-focused chemistry reference** designed to provide structured, accurate, and visual information for all **118 chemical elements**. 
 
 
 
@@ -39,6 +39,4 @@ The application uses modular React components designed for real-time interactivi
 ## 🔄 Maintenance & Support
 
 The platform is actively maintained, thoroughly audited, and continuously checked by the development team to keep up with curriculum standards and dependencies.
-
-\- **ø3**
 

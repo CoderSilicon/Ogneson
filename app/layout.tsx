@@ -1,16 +1,20 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./fonts.css";
+import icon from "./favicon.ico";
+import "katex/dist/katex.min.css";
 
 export const metadata: Metadata = {
-  title: "Silicønja",
-  icons: "/favicon.ico",
-  description: "Encyclopedia of Chemical Elements",
+  title: "Ogneson",
+  icons: {
+    icon: icon.src,
+  },
+  description: "Space' Chemical Elements",
   keywords: ["chemistry", "elements", "periodic table", "science"],
   authors: [{ name: "CoderSilicon" }],
   openGraph: {
-    title: "Silicønja",
-    description: "Encyclopedia of Chemical Elements",
+    title: "Ogneson",
+    description: "Space' Chemical Elements",
     type: "website",
   },
   verification: {
@@ -30,12 +34,13 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Silicønja",
-    url: "https://siliconja.vercel.app/",
+    name: "Ogneson",
+    url: "https://ogneson.vercel.app/",
   };
   return (
+    
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased bg-black">{children}</body>
     </html>
   );
 }

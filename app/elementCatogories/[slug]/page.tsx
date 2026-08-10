@@ -2,6 +2,26 @@ import { PeriodicData } from "@/data/elementData";
 import { CATEGORY_COLORS } from "@/data/elements";
 import { CATEGORY_DESCRIPTIONS } from "@/data/categories";
 import Link from "next/link";
+import { InlineMath } from "react-katex";
+import "katex/dist/katex.min.css";
+
+// Helper function to parse $...$ inline LaTeX formulas in strings
+function renderLatexInText(text: string) {
+  if (!text) return null;
+
+  // Split string by $...$ regex pattern
+  const parts = text.split(/(\$[^\$]+\$)/g);
+
+  return parts.map((part, index) => {
+    if (part.startsWith("$") && part.endsWith("$")) {
+      // Strip outer '$' symbols and render with KaTeX
+      const mathContent = part.slice(1, -1);
+      return <InlineMath key={index} math={mathContent} />;
+    }
+    // Return standard text string
+    return part;
+  });
+}
 
 export default async function CategoryPage({ params }: { params: { slug: string } }) {
   const { slug } = await params;
@@ -26,9 +46,11 @@ export default async function CategoryPage({ params }: { params: { slug: string 
             {info?.title || normalizedSlug.replace(/-/g, " ")}
           </h1>
 
-          {/* New line support: added 'whitespace-pre-line' and slightly smaller mobile text */}
+          {/* Render description with LaTeX support */}
           <p className="mt-6 lexend-300 text-lg md:text-xl opacity-80 max-w-3xl leading-relaxed italic whitespace-pre-line">
-            {info?.description || "Chemical data currently being indexed for this group."}
+            {info?.description 
+              ? renderLatexInText(info.description) 
+              : "Chemical data currently being indexed for this group."}
           </p>
         </header>
 
@@ -50,7 +72,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
 
                 <div className="relative z-10">
                   <h3 className="lexend-800 text-3xl md:text-4xl mb-1">{el.symbol}</h3>
-                  <p className="lexend-400 text-[10px] md:text-xs  tracking-widest opacity-70">
+                  <p className="lexend-400 text-[10px] md:text-xs tracking-widest opacity-70">
                     {el.name}
                   </p>
                 </div>
