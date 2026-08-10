@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from 'react';
 
-const Error = ({ error, reset }) => {
+type ErrorBoundaryProps = {
+  error: Error;
+  reset: () => void;
+};
+
+const Error = ({ error, reset }: ErrorBoundaryProps) => {
   const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
@@ -40,7 +45,7 @@ const Error = ({ error, reset }) => {
         </div>
 
         {/* Subtle red warning glow */}
-        <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-b from-red-500/5 via-transparent to-transparent pointer-events-none" />
       </div>
 
       {/* Narrative & Action Area */}
