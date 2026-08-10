@@ -16,9 +16,6 @@ const Loading = () => {
         {/* Center: Element Symbol with Orbital Energy Effect */}
         <div className="text-center my-auto relative flex flex-col items-center justify-center">
           
-          {/* Subtle spinning orbital ring behind symbol */}
-          <div className="absolute w-24 h-24 border border-zinc-800 border-t-white rounded-full animate-spin pointer-events-none" />
-          
           <span className="text-6xl font-bold tracking-wider text-white animate-pulse">
             Ld
           </span>
@@ -34,7 +31,7 @@ const Loading = () => {
         </div>
 
         {/* Top-to-Bottom Subtle Shimmer Effect */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-transparent pointer-events-none animate-pulse" />
+        <div className="absolute inset-0 bg-linear-to-b from-white/5 via-transparent to-transparent pointer-events-none animate-pulse" />
       </div>
 
       {/* Narrative Subtext */}
