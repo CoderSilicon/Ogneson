@@ -97,7 +97,7 @@ export default async function ElementBrief({
             <p className="text-xs sm:text-sm md:text-base text-zinc-300 max-w-2xl font-light line-clamp-2 drop-shadow-md">
               {element.desc}
             </p>
-            <div className="hidden sm:flex gap-4 font-mono text-xs lexend-200 text-zinc-400 bg-black/80 backdrop-blur-md px-4 py-2 border border-zinc-800 flex-shrink-0">
+            <div className="hidden sm:flex gap-4 font-mono text-xs lexend-200 text-zinc-400 bg-black/80 backdrop-blur-md px-4 py-2 border border-zinc-800 shrink-0">
               <span className="truncate">Disc: {element.discoveredBy}</span>
               <span>·</span>
               <span>{element.discoveryYear}</span>
@@ -287,7 +287,7 @@ function MetricCard({
 function DataRow({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="flex justify-between items-center gap-4 py-3 border-b border-zinc-900 font-mono">
-      <span className="text-[10px] sm:text-xs uppercase tracking-wider lexend-500 text-zinc-500 flex-shrink-0">
+      <span className="text-[10px] sm:text-xs uppercase tracking-wider lexend-500 text-zinc-500 shrink-0">
         {label}
       </span>
       <span className="text-xs sm:text-sm text-zinc-200 text-right truncate min-w-0">
