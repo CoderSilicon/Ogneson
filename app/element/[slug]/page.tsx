@@ -1,8 +1,10 @@
-import { PeriodicData, WAVE_FUNCTIONS } from "@/data/elementData";
+import { PeriodicData, WAVE_FUNCTIONS, CRYSTAL_DATA, SPECTRAL_DATA } from "@/data/elementData";
 import { CATEGORY_COLORS, TEXT_COLOR_MAP } from "@/data/elements";
 import { BlockMath, InlineMath } from "react-katex";
 import "katex/dist/katex.min.css";
 import { Orbital3D } from "@/components/OrbitalGlow";
+import { CrystalLatticeViewer } from "@/components/CrystalLattice";
+import { SpectralSonification } from "@/components/SpectralSonification";
 
 export default async function ElementBrief({
   params,
@@ -135,6 +137,7 @@ export default async function ElementBrief({
             <Orbital3D
               bgClass={bgClass}
               config={element.electronConfiguration}
+              category={element.category}
             />
           </div>
 
@@ -153,6 +156,19 @@ export default async function ElementBrief({
             </p>
           </div>
         </section>
+
+        {/* 4b. INTERACTIVE 3D CRYSTAL LATTICE VIEWER */}
+        {CRYSTAL_DATA[element.id] && (
+          <section className="p-6 md:p-10 bg-black border border-zinc-900">
+            <span className="text-[10px] uppercase tracking-[0.3em] font-mono lexend-500 text-zinc-500 mb-6 block">
+              Crystal Lattice Structure
+            </span>
+            <CrystalLatticeViewer
+              params={CRYSTAL_DATA[element.id]}
+              textClass={textClass}
+            />
+          </section>
+        )}
 
         {/* 5. VISUAL TELEMETRY CARDS */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -202,6 +218,20 @@ export default async function ElementBrief({
             bp={element.boilingPoint}
           />
         </section>
+
+        {/* 6. SPECTRAL LINE SONIFICATION */}
+        {SPECTRAL_DATA[element.id] && (
+          <section className="p-6 md:p-10 bg-black border border-zinc-900">
+            <span className="text-[10px] uppercase tracking-[0.3em] font-mono lexend-500 text-zinc-500 mb-6 block">
+              Emission Spectrum &amp; Quantum Audio
+            </span>
+            <SpectralSonification
+              lines={SPECTRAL_DATA[element.id]}
+              symbol={element.symbol}
+              textClass={textClass}
+            />
+          </section>
+        )}
 
         {/* 7. ISOTOPES FOOTER */}
         <footer className="pt-4 pb-12">

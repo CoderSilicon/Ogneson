@@ -16,8 +16,7 @@ interface SubshellToken {
 const L_MAP: Record<string, number> = { s: 0, p: 1, d: 2, f: 3 };
 const MAX_ELECTRONS: Record<Subshell, number> = { s: 2, p: 6, d: 10, f: 14 };
 
-// Fixed color ramp per orbital type: bright/hot core -> saturated mid -> dark edge.
-// Intentionally NOT derived from element category/bgClass - same four gradients every time.
+
 const GRADIENTS: Record<Subshell, [string, string, string]> = {
   s: ["#f0feff", "#22d3ee", "#1e3a8a"], // cyan -> blue
   p: ["#fff7e6", "#fb923c", "#7c2d12"], // amber -> ember
@@ -26,7 +25,7 @@ const GRADIENTS: Record<Subshell, [string, string, string]> = {
 };
 const NUCLEUS_COLOR = "#ff5a36";
 
-/** Parses "[Xe] 4f1 5d1 6s2" into subshell tokens, dropping the noble-gas core shorthand. */
+
 function parseConfig(config: string): SubshellToken[] {
   return config
     .replace(/\[[A-Za-z]+\]/g, "")
@@ -46,14 +45,7 @@ function parseConfig(config: string): SubshellToken[] {
     .filter((t): t is SubshellToken => t !== null);
 }
 
-/**
- * Determines which orbital shape characterizes this element (its periodic
- * table block). Configs are written shell-first ("[Ar] 3d10 4s2"), so a
- * naive "last token" read mis-classifies almost every transition metal and
- * lanthanide/actinide as s-block. We check for a partially-filled d one
- * shell in (transition metal signature) or f two shells in (lanthanide/
- * actinide signature) before falling back to the outermost shell itself.
- */
+
 function getCharacteristicSubshell(
   config: string,
   category = "",
@@ -61,10 +53,7 @@ function getCharacteristicSubshell(
   const tokens = parseConfig(config);
   const maxN = tokens.length ? Math.max(...tokens.map((t) => t.n)) : 1;
 
-  // Category is ground truth for block — it already encodes the "how a
-  // chemist would classify this element" answer, including the edge cases
-  // (Cu/Zn/Ag/Au as d-block, La-Lu and Ac-Lr as f-block) that pure config
-  // parsing gets wrong once a subshell finishes filling.
+
   const categoryBlock: Partial<Record<string, Subshell>> = {
     Alkali: "s",
     "Alkaline Earth": "s",
@@ -76,10 +65,37 @@ function getCharacteristicSubshell(
     return { subshell: categoryBlock[category]!, maxN };
   }
 
-  // Everything else (Halogen, Noble Gas, Metalloid, Post-Transition,
-  // Reactive Nonmetal, Unknown) is s or p depending on the element itself
-  // (e.g. H/He are s, C-O-F-Ne are p) — config parsing handles this fine
-  // since there's no d/f full-shell ambiguity to worry about here.
+
+  if (maxN >= 2) {
+    const dToken = tokens.find(
+      (t) => t.n === maxN - 1 && t.l === 2 && t.count >= 1 && t.count <= 9,
+    );
+    if (dToken) {
+      return { subshell: "d", maxN };
+    }
+  }
+
+  if (maxN >= 3) {
+    const fToken = tokens.find(
+      (t) => t.n === maxN - 2 && t.l === 3 && t.count >= 1 && t.count <= 13,
+    );
+    if (fToken) {
+      return { subshell: "f", maxN };
+    }
+
+    const fFull = tokens.find(
+      (t) => t.n === maxN - 2 && t.l === 3 && t.count >= 14,
+    );
+    if (fFull) {
+      const outer = tokens.filter((t) => t.n === maxN && t.count > 0);
+      const hasP = outer.some((t) => t.l === 1);
+      if (!hasP) {
+        return { subshell: "f", maxN };
+      }
+    }
+  }
+
+
   if (tokens.length === 0) return { subshell: "s", maxN };
   const outer = tokens.filter((t) => t.n === maxN && t.count > 0);
   if (outer.length === 0) return { subshell: "s", maxN };
@@ -89,7 +105,6 @@ function getCharacteristicSubshell(
 
 // ---------- particle-cloud sampling helpers ----------
 
-/** Standard normal sample via Box-Muller. */
 function gaussian(): number {
   let u = 0;
   let v = 0;
@@ -363,13 +378,15 @@ const GENERATORS: Record<
 
 export function Orbital3D({
   config,
+  category,
 }: {
   bgClass?: string;
   config: string;
+  category?: string;
 }) {
   const { subshell, maxN } = useMemo(
-    () => getCharacteristicSubshell(config),
-    [config],
+    () => getCharacteristicSubshell(config, category),
+    [config, category],
   );
   const scale = Math.min(1.4, Math.max(0.8, 0.75 + maxN * 0.06));
 

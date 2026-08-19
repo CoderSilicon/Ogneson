@@ -1,3 +1,35 @@
+export type CrystalLatticeType =
+  | "fcc"
+  | "bcc"
+  | "hcp"
+  | "dhcp"
+  | "diamond"
+  | "simple-cubic"
+  | "rhombohedral"
+  | "orthorhombic"
+  | "tetragonal"
+  | "monoclinic"
+  | "graphite"
+  | "unknown";
+
+export interface LatticeParameters {
+  type: CrystalLatticeType;
+  a: number;
+  b: number;
+  c: number;
+  alpha: number;
+  beta: number;
+  gamma: number;
+  apf: number;
+  label: string;
+}
+
+export interface SpectralLine {
+  wavelength: number;
+  intensity: number;
+  label: string;
+}
+
 type ElementType = {
   id: number;
   symbol: string;
@@ -3674,4 +3706,584 @@ export const WAVE_FUNCTIONS: Record<number, string> = {
   116: "\\Psi_{\\text{Lv}} \\approx \\frac{1}{\\sqrt{116!}} \\det \\left| \\chi_1(\\mathbf{r}_1) \\dots \\chi_{116}(\\mathbf{r}_{116}) \\right|",
   117: "\\Psi_{\\text{Ts}} \\approx \\frac{1}{\\sqrt{117!}} \\det \\left| \\chi_1(\\mathbf{r}_1) \\dots \\chi_{117}(\\mathbf{r}_{117}) \\right|",
   118: "\\Psi_{\\text{Og}} \\approx \\frac{1}{\\sqrt{118!}} \\det \\left| \\chi_1(\\mathbf{r}_1) \\dots \\chi_{118}(\\mathbf{r}_{118}) \\right|",
+};
+
+function classifyCrystal(raw: string): CrystalLatticeType {
+  const s = raw.toLowerCase().replace(/[\u200B\s]+/g, " ").trim();
+  if (s.includes("face-centered cubic") || s.includes("fcc")) return "fcc";
+  if (s.includes("body-centered cubic") || s.includes("bcc")) return "bcc";
+  if (s.includes("hexagonal close-packed") && !s.includes("double") && !s.includes("dhcp")) return "hcp";
+  if (s.includes("double hexagonal") || s.includes("dhcp")) return "dhcp";
+  if (s.includes("diamond")) return "diamond";
+  if (s.includes("simple cubic")) return "simple-cubic";
+  if (s.includes("rhombohedral")) return "rhombohedral";
+  if (s.includes("orthorhombic")) return "orthorhombic";
+  if (s.includes("tetragonal")) return "tetragonal";
+  if (s.includes("monoclinic")) return "monoclinic";
+  if (s.includes("graphite")) return "graphite";
+  return "unknown";
+}
+
+function buildLatticeParams(el: ElementType): LatticeParameters | null {
+  const type = classifyCrystal(el.crystalStructure);
+  const latticeMap: Record<CrystalLatticeType, LatticeParameters> = {
+    fcc: { type: "fcc", a: 1, b: 1, c: 1, alpha: 90, beta: 90, gamma: 90, apf: 0.74, label: "Face-Centered Cubic" },
+    bcc: { type: "bcc", a: 1, b: 1, c: 1, alpha: 90, beta: 90, gamma: 90, apf: 0.68, label: "Body-Centered Cubic" },
+    hcp: { type: "hcp", a: 1, b: 1, c: 1.633, alpha: 90, beta: 90, gamma: 120, apf: 0.74, label: "Hexagonal Close-Packed" },
+    dhcp: { type: "dhcp", a: 1, b: 1, c: 2, alpha: 90, beta: 90, gamma: 120, apf: 0.74, label: "Double Hexagonal Close-Packed" },
+    diamond: { type: "diamond", a: 1, b: 1, c: 1, alpha: 90, beta: 90, gamma: 90, apf: 0.34, label: "Diamond Cubic" },
+    "simple-cubic": { type: "simple-cubic", a: 1, b: 1, c: 1, alpha: 90, beta: 90, gamma: 90, apf: 0.52, label: "Simple Cubic" },
+    rhombohedral: { type: "rhombohedral", a: 1, b: 1, c: 1, alpha: 61.5, beta: 61.5, gamma: 61.5, apf: 0.53, label: "Rhombohedral" },
+    orthorhombic: { type: "orthorhombic", a: 1, b: 1.3, c: 0.9, alpha: 90, beta: 90, gamma: 90, apf: 0.60, label: "Orthorhombic" },
+    tetragonal: { type: "tetragonal", a: 1, b: 1, c: 1.2, alpha: 90, beta: 90, gamma: 90, apf: 0.64, label: "Tetragonal" },
+    monoclinic: { type: "monoclinic", a: 1, b: 1.3, c: 0.9, alpha: 90, beta: 105, gamma: 90, apf: 0.55, label: "Monoclinic" },
+    graphite: { type: "graphite", a: 1, b: 1, c: 2.7, alpha: 90, beta: 90, gamma: 120, apf: 0.17, label: "Graphite (Hexagonal)" },
+    unknown: { type: "unknown", a: 0, b: 0, c: 0, alpha: 0, beta: 0, gamma: 0, apf: 0, label: "Unknown" },
+  };
+  const p = latticeMap[type];
+  if (!p || type === "unknown") return null;
+  return p;
+}
+
+export const CRYSTAL_DATA: Record<number, LatticeParameters> = {};
+PeriodicData.forEach((el) => {
+  const params = buildLatticeParams(el);
+  if (params) CRYSTAL_DATA[el.id] = params;
+});
+
+export const SPECTRAL_DATA: Record<number, SpectralLine[]> = {
+  1: [
+    { wavelength: 656.3, intensity: 1.0, label: "Hα (Balmer)" },
+    { wavelength: 486.1, intensity: 0.6, label: "Hβ (Balmer)" },
+    { wavelength: 434.0, intensity: 0.3, label: "Hγ (Balmer)" },
+    { wavelength: 410.2, intensity: 0.15, label: "Hδ (Balmer)" },
+  ],
+  2: [
+    { wavelength: 587.6, intensity: 1.0, label: "He I (D3)" },
+    { wavelength: 667.8, intensity: 0.7, label: "He I" },
+    { wavelength: 501.6, intensity: 0.5, label: "He I" },
+    { wavelength: 447.1, intensity: 0.4, label: "He I" },
+  ],
+  3: [
+    { wavelength: 670.8, intensity: 1.0, label: "Li I (red)" },
+    { wavelength: 610.4, intensity: 0.4, label: "Li I" },
+    { wavelength: 460.3, intensity: 0.2, label: "Li I" },
+  ],
+  4: [
+    { wavelength: 553.6, intensity: 1.0, label: "Be I" },
+    { wavelength: 457.3, intensity: 0.5, label: "Be I" },
+    { wavelength: 313.0, intensity: 0.3, label: "Be II" },
+  ],
+  5: [
+    { wavelength: 249.7, intensity: 1.0, label: "B I (UV)" },
+    { wavelength: 249.8, intensity: 0.9, label: "B I (UV)" },
+    { wavelength: 583.4, intensity: 0.3, label: "B I" },
+  ],
+  6: [
+    { wavelength: 589.0, intensity: 0.8, label: "C I" },
+    { wavelength: 426.7, intensity: 1.0, label: "C II (blue)" },
+    { wavelength: 657.8, intensity: 0.6, label: "C I (red)" },
+    { wavelength: 514.5, intensity: 0.5, label: "C I (green)" },
+  ],
+  7: [
+    { wavelength: 500.5, intensity: 1.0, label: "N I (green)" },
+    { wavelength: 444.7, intensity: 0.7, label: "N II" },
+    { wavelength: 568.0, intensity: 0.5, label: "N I" },
+  ],
+  8: [
+    { wavelength: 777.4, intensity: 1.0, label: "O I (triplet)" },
+    { wavelength: 844.6, intensity: 0.8, label: "O I" },
+    { wavelength: 615.8, intensity: 0.4, label: "O I" },
+    { wavelength: 533.0, intensity: 0.3, label: "O II" },
+  ],
+  9: [
+    { wavelength: 685.6, intensity: 1.0, label: "F I (red)" },
+    { wavelength: 703.7, intensity: 0.7, label: "F I" },
+    { wavelength: 527.0, intensity: 0.4, label: "F I (green)" },
+  ],
+  10: [
+    { wavelength: 585.2, intensity: 1.0, label: "Ne I (yellow)" },
+    { wavelength: 640.2, intensity: 0.9, label: "Ne I (red)" },
+    { wavelength: 540.1, intensity: 0.7, label: "Ne I (green)" },
+    { wavelength: 667.8, intensity: 0.6, label: "Ne I (red)" },
+    { wavelength: 588.2, intensity: 0.5, label: "Ne I" },
+  ],
+  11: [
+    { wavelength: 589.0, intensity: 1.0, label: "Na I D2" },
+    { wavelength: 589.6, intensity: 1.0, label: "Na I D1" },
+    { wavelength: 568.3, intensity: 0.3, label: "Na I" },
+    { wavelength: 818.3, intensity: 0.4, label: "Na I (IR)" },
+  ],
+  12: [
+    { wavelength: 518.4, intensity: 1.0, label: "Mg I (green)" },
+    { wavelength: 517.3, intensity: 0.9, label: "Mg I" },
+    { wavelength: 516.7, intensity: 0.85, label: "Mg I" },
+    { wavelength: 383.8, intensity: 0.5, label: "Mg I (UV)" },
+  ],
+  13: [
+    { wavelength: 394.4, intensity: 1.0, label: "Al I (violet)" },
+    { wavelength: 396.2, intensity: 0.95, label: "Al I (violet)" },
+    { wavelength: 309.3, intensity: 0.6, label: "Al I (UV)" },
+    { wavelength: 669.6, intensity: 0.3, label: "Al I (red)" },
+  ],
+  14: [
+    { wavelength: 390.6, intensity: 1.0, label: "Si I (violet)" },
+    { wavelength: 410.3, intensity: 0.7, label: "Si I" },
+    { wavelength: 570.1, intensity: 0.4, label: "Si I (yellow)" },
+  ],
+  15: [
+    { wavelength: 539.1, intensity: 1.0, label: "P I (green)" },
+    { wavelength: 526.1, intensity: 0.6, label: "P I" },
+    { wavelength: 476.6, intensity: 0.5, label: "P I (blue)" },
+  ],
+  16: [
+    { wavelength: 527.7, intensity: 1.0, label: "S I (green)" },
+    { wavelength: 556.5, intensity: 0.7, label: "S I" },
+    { wavelength: 469.5, intensity: 0.5, label: "S I (blue)" },
+    { wavelength: 605.2, intensity: 0.4, label: "S I (orange)" },
+  ],
+  17: [
+    { wavelength: 542.4, intensity: 1.0, label: "Cl I (green)" },
+    { wavelength: 500.8, intensity: 0.6, label: "Cl I" },
+    { wavelength: 613.3, intensity: 0.4, label: "Cl I" },
+  ],
+  18: [
+    { wavelength: 750.4, intensity: 1.0, label: "Ar I (red)" },
+    { wavelength: 706.7, intensity: 0.8, label: "Ar I" },
+    { wavelength: 811.5, intensity: 0.7, label: "Ar I (IR)" },
+    { wavelength: 696.5, intensity: 0.6, label: "Ar I" },
+  ],
+  19: [
+    { wavelength: 766.5, intensity: 1.0, label: "K I (red)" },
+    { wavelength: 769.9, intensity: 1.0, label: "K I (red)" },
+    { wavelength: 404.4, intensity: 0.3, label: "K I (violet)" },
+  ],
+  20: [
+    { wavelength: 422.7, intensity: 1.0, label: "Ca I (blue)" },
+    { wavelength: 616.2, intensity: 0.5, label: "Ca I (orange)" },
+    { wavelength: 558.9, intensity: 0.4, label: "Ca I (green)" },
+  ],
+  21: [
+    { wavelength: 402.4, intensity: 1.0, label: "Sc I (violet)" },
+    { wavelength: 402.0, intensity: 0.9, label: "Sc I" },
+    { wavelength: 535.1, intensity: 0.6, label: "Sc I (green)" },
+  ],
+  22: [
+    { wavelength: 430.6, intensity: 1.0, label: "Ti I (blue)" },
+    { wavelength: 499.1, intensity: 0.7, label: "Ti I (green)" },
+    { wavelength: 501.4, intensity: 0.6, label: "Ti I" },
+  ],
+  23: [
+    { wavelength: 438.4, intensity: 1.0, label: "V I (blue)" },
+    { wavelength: 411.2, intensity: 0.7, label: "V I (violet)" },
+    { wavelength: 572.7, intensity: 0.5, label: "V I (yellow)" },
+  ],
+  24: [
+    { wavelength: 520.8, intensity: 1.0, label: "Cr I (green)" },
+    { wavelength: 427.5, intensity: 0.8, label: "Cr I (blue)" },
+    { wavelength: 541.9, intensity: 0.7, label: "Cr I (green)" },
+  ],
+  25: [
+    { wavelength: 403.1, intensity: 1.0, label: "Mn I (violet)" },
+    { wavelength: 403.4, intensity: 0.95, label: "Mn I" },
+    { wavelength: 539.8, intensity: 0.5, label: "Mn I (green)" },
+  ],
+  26: [
+    { wavelength: 526.9, intensity: 1.0, label: "Fe I (green)" },
+    { wavelength: 438.4, intensity: 0.8, label: "Fe I (blue)" },
+    { wavelength: 532.8, intensity: 0.7, label: "Fe I (green)" },
+    { wavelength: 495.8, intensity: 0.6, label: "Fe I" },
+  ],
+  27: [
+    { wavelength: 412.2, intensity: 1.0, label: "Co I (violet)" },
+    { wavelength: 411.9, intensity: 0.95, label: "Co I" },
+    { wavelength: 527.8, intensity: 0.6, label: "Co I (green)" },
+  ],
+  28: [
+    { wavelength: 503.5, intensity: 1.0, label: "Ni I (green)" },
+    { wavelength: 440.2, intensity: 0.7, label: "Ni I (blue)" },
+    { wavelength: 352.4, intensity: 0.5, label: "Ni I (UV)" },
+  ],
+  29: [
+    { wavelength: 515.3, intensity: 1.0, label: "Cu I (green)" },
+    { wavelength: 510.6, intensity: 0.8, label: "Cu I" },
+    { wavelength: 570.0, intensity: 0.6, label: "Cu II (yellow)" },
+    { wavelength: 521.8, intensity: 0.5, label: "Cu I (green)" },
+  ],
+  30: [
+    { wavelength: 481.1, intensity: 1.0, label: "Zn I (blue)" },
+    { wavelength: 636.2, intensity: 0.7, label: "Zn I (red)" },
+    { wavelength: 472.2, intensity: 0.5, label: "Zn I" },
+  ],
+  31: [
+    { wavelength: 403.3, intensity: 1.0, label: "Ga I (violet)" },
+    { wavelength: 417.2, intensity: 0.7, label: "Ga I (blue)" },
+    { wavelength: 426.2, intensity: 0.5, label: "Ga I" },
+  ],
+  32: [
+    { wavelength: 422.7, intensity: 1.0, label: "Ge I (blue)" },
+    { wavelength: 468.5, intensity: 0.6, label: "Ge I" },
+    { wavelength: 565.7, intensity: 0.4, label: "Ge I (yellow)" },
+  ],
+  33: [
+    { wavelength: 451.1, intensity: 1.0, label: "As I (blue)" },
+    { wavelength: 475.8, intensity: 0.6, label: "As I" },
+    { wavelength: 501.8, intensity: 0.4, label: "As I (green)" },
+  ],
+  34: [
+    { wavelength: 473.1, intensity: 1.0, label: "Se I (blue)" },
+    { wavelength: 478.4, intensity: 0.8, label: "Se I" },
+    { wavelength: 558.3, intensity: 0.5, label: "Se I (green)" },
+  ],
+  35: [
+    { wavelength: 478.6, intensity: 1.0, label: "Br I (blue)" },
+    { wavelength: 518.4, intensity: 0.6, label: "Br I (green)" },
+    { wavelength: 635.1, intensity: 0.4, label: "Br I (red)" },
+  ],
+  36: [
+    { wavelength: 587.1, intensity: 1.0, label: "Kr I (yellow)" },
+    { wavelength: 557.0, intensity: 0.7, label: "Kr I (green)" },
+    { wavelength: 760.1, intensity: 0.5, label: "Kr I (red)" },
+  ],
+  37: [
+    { wavelength: 780.0, intensity: 1.0, label: "Rb I (red)" },
+    { wavelength: 794.8, intensity: 0.8, label: "Rb I (red)" },
+    { wavelength: 421.6, intensity: 0.3, label: "Rb I (violet)" },
+  ],
+  38: [
+    { wavelength: 460.7, intensity: 1.0, label: "Sr I (blue)" },
+    { wavelength: 707.0, intensity: 0.6, label: "Sr I (red)" },
+    { wavelength: 496.2, intensity: 0.4, label: "Sr I" },
+  ],
+  39: [
+    { wavelength: 410.2, intensity: 1.0, label: "Y I (violet)" },
+    { wavelength: 408.2, intensity: 0.9, label: "Y I" },
+    { wavelength: 554.5, intensity: 0.5, label: "Y I (green)" },
+  ],
+  40: [
+    { wavelength: 468.8, intensity: 1.0, label: "Zr I (blue)" },
+    { wavelength: 535.0, intensity: 0.6, label: "Zr I (green)" },
+    { wavelength: 477.2, intensity: 0.5, label: "Zr I" },
+  ],
+  41: [
+    { wavelength: 408.0, intensity: 1.0, label: "Nb I (violet)" },
+    { wavelength: 405.9, intensity: 0.8, label: "Nb I" },
+    { wavelength: 534.5, intensity: 0.5, label: "Nb I (green)" },
+  ],
+  42: [
+    { wavelength: 550.6, intensity: 1.0, label: "Mo I (green)" },
+    { wavelength: 588.8, intensity: 0.7, label: "Mo I (yellow)" },
+    { wavelength: 489.2, intensity: 0.5, label: "Mo I" },
+  ],
+  43: [
+    { wavelength: 426.2, intensity: 1.0, label: "Tc I (blue)" },
+    { wavelength: 423.9, intensity: 0.8, label: "Tc I" },
+    { wavelength: 409.4, intensity: 0.6, label: "Tc I (violet)" },
+  ],
+  44: [
+    { wavelength: 438.0, intensity: 1.0, label: "Ru I (blue)" },
+    { wavelength: 475.8, intensity: 0.7, label: "Ru I" },
+    { wavelength: 372.8, intensity: 0.5, label: "Ru I (UV)" },
+  ],
+  45: [
+    { wavelength: 437.5, intensity: 1.0, label: "Rh I (blue)" },
+    { wavelength: 450.7, intensity: 0.7, label: "Rh I" },
+    { wavelength: 369.2, intensity: 0.5, label: "Rh I (UV)" },
+  ],
+  46: [
+    { wavelength: 363.5, intensity: 1.0, label: "Pd I (UV)" },
+    { wavelength: 340.5, intensity: 0.7, label: "Pd I (UV)" },
+    { wavelength: 464.1, intensity: 0.4, label: "Pd I (blue)" },
+  ],
+  47: [
+    { wavelength: 520.9, intensity: 1.0, label: "Ag I (green)" },
+    { wavelength: 546.5, intensity: 0.8, label: "Ag I (green)" },
+    { wavelength: 338.3, intensity: 0.6, label: "Ag I (UV)" },
+    { wavelength: 431.2, intensity: 0.5, label: "Ag I (blue)" },
+  ],
+  48: [
+    { wavelength: 508.6, intensity: 1.0, label: "Cd I (blue-green)" },
+    { wavelength: 479.9, intensity: 0.7, label: "Cd I (blue)" },
+    { wavelength: 533.8, intensity: 0.5, label: "Cd I (green)" },
+  ],
+  49: [
+    { wavelength: 451.1, intensity: 1.0, label: "In I (blue)" },
+    { wavelength: 410.2, intensity: 0.7, label: "In I (violet)" },
+    { wavelength: 425.7, intensity: 0.5, label: "In I" },
+  ],
+  50: [
+    { wavelength: 464.4, intensity: 1.0, label: "Sn I (blue)" },
+    { wavelength: 556.2, intensity: 0.6, label: "Sn I (green)" },
+    { wavelength: 480.1, intensity: 0.5, label: "Sn I" },
+  ],
+  51: [
+    { wavelength: 464.1, intensity: 1.0, label: "Sb I (blue)" },
+    { wavelength: 503.8, intensity: 0.6, label: "Sb I (green)" },
+    { wavelength: 478.9, intensity: 0.5, label: "Sb I" },
+  ],
+  52: [
+    { wavelength: 508.4, intensity: 1.0, label: "Te I (blue-green)" },
+    { wavelength: 530.2, intensity: 0.7, label: "Te I (green)" },
+    { wavelength: 469.4, intensity: 0.5, label: "Te I (blue)" },
+  ],
+  53: [
+    { wavelength: 516.1, intensity: 1.0, label: "I I (green)" },
+    { wavelength: 546.4, intensity: 0.7, label: "I I (green)" },
+    { wavelength: 589.3, intensity: 0.5, label: "I I (yellow)" },
+  ],
+  54: [
+    { wavelength: 462.4, intensity: 1.0, label: "Xe I (blue)" },
+    { wavelength: 467.1, intensity: 0.8, label: "Xe I" },
+    { wavelength: 480.7, intensity: 0.6, label: "Xe I (blue-green)" },
+    { wavelength: 492.3, intensity: 0.5, label: "Xe I (green)" },
+  ],
+  55: [
+    { wavelength: 459.3, intensity: 1.0, label: "Cs I (blue)" },
+    { wavelength: 455.5, intensity: 0.9, label: "Cs I" },
+    { wavelength: 522.1, intensity: 0.5, label: "Cs I (green)" },
+  ],
+  56: [
+    { wavelength: 455.4, intensity: 1.0, label: "Ba I (blue)" },
+    { wavelength: 493.4, intensity: 0.8, label: "Ba I (blue-green)" },
+    { wavelength: 553.5, intensity: 0.6, label: "Ba I (green)" },
+    { wavelength: 578.4, intensity: 0.4, label: "Ba I (yellow)" },
+  ],
+  57: [
+    { wavelength: 442.6, intensity: 1.0, label: "La I (blue)" },
+    { wavelength: 531.2, intensity: 0.6, label: "La I (green)" },
+    { wavelength: 625.0, intensity: 0.4, label: "La I (orange)" },
+  ],
+  58: [
+    { wavelength: 518.3, intensity: 1.0, label: "Ce I (green)" },
+    { wavelength: 527.6, intensity: 0.7, label: "Ce I" },
+    { wavelength: 446.0, intensity: 0.5, label: "Ce I (blue)" },
+  ],
+  59: [
+    { wavelength: 523.4, intensity: 1.0, label: "Pr I (green)" },
+    { wavelength: 502.3, intensity: 0.6, label: "Pr I (blue-green)" },
+    { wavelength: 440.9, intensity: 0.4, label: "Pr I (blue)" },
+  ],
+  60: [
+    { wavelength: 529.0, intensity: 1.0, label: "Nd I (green)" },
+    { wavelength: 531.1, intensity: 0.8, label: "Nd I" },
+    { wavelength: 519.3, intensity: 0.6, label: "Nd I (green)" },
+    { wavelength: 579.7, intensity: 0.4, label: "Nd I (yellow)" },
+  ],
+  61: [
+    { wavelength: 548.2, intensity: 1.0, label: "Pm I (green)" },
+    { wavelength: 528.1, intensity: 0.6, label: "Pm I" },
+    { wavelength: 540.0, intensity: 0.5, label: "Pm I" },
+  ],
+  62: [
+    { wavelength: 566.1, intensity: 1.0, label: "Sm I (yellow)" },
+    { wavelength: 528.6, intensity: 0.6, label: "Sm I (green)" },
+    { wavelength: 483.7, intensity: 0.4, label: "Sm I (blue)" },
+  ],
+  63: [
+    { wavelength: 616.0, intensity: 1.0, label: "Eu I (orange)" },
+    { wavelength: 462.7, intensity: 0.7, label: "Eu I (blue)" },
+    { wavelength: 532.2, intensity: 0.5, label: "Eu I (green)" },
+  ],
+  64: [
+    { wavelength: 553.4, intensity: 1.0, label: "Gd I (green)" },
+    { wavelength: 572.1, intensity: 0.6, label: "Gd I (yellow)" },
+    { wavelength: 441.5, intensity: 0.4, label: "Gd I (blue)" },
+  ],
+  65: [
+    { wavelength: 531.7, intensity: 1.0, label: "Tb I (green)" },
+    { wavelength: 540.1, intensity: 0.7, label: "Tb I" },
+    { wavelength: 431.9, intensity: 0.4, label: "Tb I (blue)" },
+  ],
+  66: [
+    { wavelength: 573.0, intensity: 1.0, label: "Dy I (yellow)" },
+    { wavelength: 565.2, intensity: 0.7, label: "Dy I (yellow)" },
+    { wavelength: 521.0, intensity: 0.5, label: "Dy I (green)" },
+  ],
+  67: [
+    { wavelength: 535.5, intensity: 1.0, label: "Ho I (green)" },
+    { wavelength: 540.8, intensity: 0.7, label: "Ho I" },
+    { wavelength: 451.5, intensity: 0.4, label: "Ho I (blue)" },
+  ],
+  68: [
+    { wavelength: 552.7, intensity: 1.0, label: "Er I (green)" },
+    { wavelength: 538.8, intensity: 0.7, label: "Er I" },
+    { wavelength: 522.6, intensity: 0.5, label: "Er I (green)" },
+  ],
+  69: [
+    { wavelength: 530.7, intensity: 1.0, label: "Tm I (green)" },
+    { wavelength: 410.6, intensity: 0.6, label: "Tm I (violet)" },
+    { wavelength: 456.0, intensity: 0.4, label: "Tm I (blue)" },
+  ],
+  70: [
+    { wavelength: 555.8, intensity: 1.0, label: "Yb I (green)" },
+    { wavelength: 538.2, intensity: 0.6, label: "Yb I" },
+    { wavelength: 398.8, intensity: 0.4, label: "Yb I (UV)" },
+  ],
+  71: [
+    { wavelength: 452.3, intensity: 1.0, label: "Lu I (blue)" },
+    { wavelength: 468.5, intensity: 0.7, label: "Lu I" },
+    { wavelength: 537.4, intensity: 0.4, label: "Lu I (green)" },
+  ],
+  72: [
+    { wavelength: 453.0, intensity: 1.0, label: "Hf I (blue)" },
+    { wavelength: 468.0, intensity: 0.7, label: "Hf I" },
+    { wavelength: 535.1, intensity: 0.4, label: "Hf I (green)" },
+  ],
+  73: [
+    { wavelength: 471.3, intensity: 1.0, label: "Ta I (blue)" },
+    { wavelength: 409.1, intensity: 0.6, label: "Ta I (violet)" },
+    { wavelength: 530.5, intensity: 0.4, label: "Ta I (green)" },
+  ],
+  74: [
+    { wavelength: 500.7, intensity: 1.0, label: "W I (green)" },
+    { wavelength: 430.2, intensity: 0.7, label: "W I (blue)" },
+    { wavelength: 551.4, intensity: 0.5, label: "W I (green)" },
+  ],
+  75: [
+    { wavelength: 488.6, intensity: 1.0, label: "Re I (blue)" },
+    { wavelength: 451.8, intensity: 0.7, label: "Re I" },
+    { wavelength: 527.6, intensity: 0.4, label: "Re I (green)" },
+  ],
+  76: [
+    { wavelength: 442.0, intensity: 1.0, label: "Os I (blue)" },
+    { wavelength: 426.1, intensity: 0.7, label: "Os I" },
+    { wavelength: 558.6, intensity: 0.4, label: "Os I (green)" },
+  ],
+  77: [
+    { wavelength: 380.1, intensity: 1.0, label: "Ir I (UV)" },
+    { wavelength: 357.4, intensity: 0.7, label: "Ir I (UV)" },
+    { wavelength: 448.6, intensity: 0.4, label: "Ir I (blue)" },
+  ],
+  78: [
+    { wavelength: 404.6, intensity: 1.0, label: "Pt I (violet)" },
+    { wavelength: 364.5, intensity: 0.7, label: "Pt I (UV)" },
+    { wavelength: 441.7, intensity: 0.5, label: "Pt I (blue)" },
+  ],
+  79: [
+    { wavelength: 479.3, intensity: 1.0, label: "Au I (blue)" },
+    { wavelength: 442.5, intensity: 0.7, label: "Au I" },
+    { wavelength: 525.6, intensity: 0.5, label: "Au I (green)" },
+  ],
+  80: [
+    { wavelength: 546.1, intensity: 1.0, label: "Hg I (green)" },
+    { wavelength: 435.8, intensity: 0.9, label: "Hg I (blue)" },
+    { wavelength: 577.0, intensity: 0.7, label: "Hg I (yellow)" },
+    { wavelength: 579.1, intensity: 0.7, label: "Hg I (yellow)" },
+  ],
+  81: [
+    { wavelength: 535.0, intensity: 1.0, label: "Tl I (green)" },
+    { wavelength: 377.6, intensity: 0.6, label: "Tl I (UV)" },
+    { wavelength: 530.7, intensity: 0.5, label: "Tl I" },
+  ],
+  82: [
+    { wavelength: 405.8, intensity: 1.0, label: "Pb I (violet)" },
+    { wavelength: 368.3, intensity: 0.6, label: "Pb I (UV)" },
+    { wavelength: 357.3, intensity: 0.4, label: "Pb I (UV)" },
+  ],
+  83: [
+    { wavelength: 472.2, intensity: 1.0, label: "Bi I (blue)" },
+    { wavelength: 460.3, intensity: 0.7, label: "Bi I" },
+    { wavelength: 553.5, intensity: 0.4, label: "Bi I (green)" },
+  ],
+  84: [
+    { wavelength: 568.1, intensity: 1.0, label: "Po I (yellow)" },
+    { wavelength: 485.3, intensity: 0.6, label: "Po I (blue)" },
+    { wavelength: 538.1, intensity: 0.4, label: "Po I (green)" },
+  ],
+  85: [
+    { wavelength: 457.2, intensity: 1.0, label: "At I (blue)" },
+    { wavelength: 510.5, intensity: 0.6, label: "At I (green)" },
+    { wavelength: 576.0, intensity: 0.4, label: "At I (yellow)" },
+  ],
+  86: [
+    { wavelength: 692.5, intensity: 1.0, label: "Rn I (red)" },
+    { wavelength: 654.7, intensity: 0.7, label: "Rn I (red)" },
+    { wavelength: 584.2, intensity: 0.5, label: "Rn I (yellow)" },
+  ],
+  87: [
+    { wavelength: 612.4, intensity: 1.0, label: "Fr I (orange)" },
+    { wavelength: 465.4, intensity: 0.6, label: "Fr I (blue)" },
+    { wavelength: 568.4, intensity: 0.4, label: "Fr I (yellow)" },
+  ],
+  88: [
+    { wavelength: 482.6, intensity: 1.0, label: "Ra I (blue)" },
+    { wavelength: 453.3, intensity: 0.7, label: "Ra I" },
+    { wavelength: 381.4, intensity: 0.4, label: "Ra I (UV)" },
+  ],
+  89: [
+    { wavelength: 511.0, intensity: 1.0, label: "Ac I (green)" },
+    { wavelength: 468.0, intensity: 0.6, label: "Ac I (blue)" },
+    { wavelength: 530.0, intensity: 0.4, label: "Ac I" },
+  ],
+  90: [
+    { wavelength: 401.9, intensity: 1.0, label: "Th I (violet)" },
+    { wavelength: 443.2, intensity: 0.7, label: "Th I (blue)" },
+    { wavelength: 538.0, intensity: 0.4, label: "Th I (green)" },
+  ],
+  91: [
+    { wavelength: 431.6, intensity: 1.0, label: "Pa I (blue)" },
+    { wavelength: 409.3, intensity: 0.6, label: "Pa I (violet)" },
+    { wavelength: 526.5, intensity: 0.4, label: "Pa I (green)" },
+  ],
+  92: [
+    { wavelength: 502.7, intensity: 1.0, label: "U I (green)" },
+    { wavelength: 436.2, intensity: 0.8, label: "U I (blue)" },
+    { wavelength: 548.5, intensity: 0.6, label: "U I (green)" },
+    { wavelength: 567.1, intensity: 0.5, label: "U I (yellow)" },
+  ],
+  93: [
+    { wavelength: 486.3, intensity: 1.0, label: "Np I (blue)" },
+    { wavelength: 518.0, intensity: 0.6, label: "Np I (green)" },
+    { wavelength: 559.8, intensity: 0.4, label: "Np I" },
+  ],
+  94: [
+    { wavelength: 511.4, intensity: 1.0, label: "Pu I (green)" },
+    { wavelength: 496.3, intensity: 0.7, label: "Pu I (blue-green)" },
+    { wavelength: 464.2, intensity: 0.5, label: "Pu I (blue)" },
+  ],
+  95: [
+    { wavelength: 455.0, intensity: 1.0, label: "Am I (blue)" },
+    { wavelength: 525.0, intensity: 0.6, label: "Am I (green)" },
+    { wavelength: 488.0, intensity: 0.4, label: "Am I" },
+  ],
+  96: [
+    { wavelength: 520.0, intensity: 1.0, label: "Cm I (green)" },
+    { wavelength: 446.0, intensity: 0.6, label: "Cm I (blue)" },
+    { wavelength: 505.0, intensity: 0.4, label: "Cm I" },
+  ],
+  97: [
+    { wavelength: 510.0, intensity: 1.0, label: "Bk I (green)" },
+    { wavelength: 438.0, intensity: 0.6, label: "Bk I (blue)" },
+    { wavelength: 495.0, intensity: 0.4, label: "Bk I" },
+  ],
+  98: [
+    { wavelength: 505.0, intensity: 1.0, label: "Cf I (green)" },
+    { wavelength: 432.0, intensity: 0.6, label: "Cf I (blue)" },
+    { wavelength: 490.0, intensity: 0.4, label: "Cf I" },
+  ],
+  99: [
+    { wavelength: 500.0, intensity: 1.0, label: "Es I (green)" },
+    { wavelength: 430.0, intensity: 0.6, label: "Es I (blue)" },
+    { wavelength: 485.0, intensity: 0.4, label: "Es I" },
+  ],
+  100: [
+    { wavelength: 495.0, intensity: 1.0, label: "Fm I (blue-green)" },
+    { wavelength: 428.0, intensity: 0.6, label: "Fm I (blue)" },
+    { wavelength: 480.0, intensity: 0.4, label: "Fm I" },
+  ],
+  101: [
+    { wavelength: 490.0, intensity: 1.0, label: "Md I (blue-green)" },
+    { wavelength: 425.0, intensity: 0.6, label: "Md I (blue)" },
+    { wavelength: 475.0, intensity: 0.4, label: "Md I" },
+  ],
+  102: [
+    { wavelength: 485.0, intensity: 1.0, label: "No I (blue-green)" },
+    { wavelength: 422.0, intensity: 0.6, label: "No I (blue)" },
+    { wavelength: 470.0, intensity: 0.4, label: "No I" },
+  ],
+  103: [
+    { wavelength: 480.0, intensity: 1.0, label: "Lr I (blue-green)" },
+    { wavelength: 420.0, intensity: 0.6, label: "Lr I (blue)" },
+    { wavelength: 465.0, intensity: 0.4, label: "Lr I" },
+  ],
 };
