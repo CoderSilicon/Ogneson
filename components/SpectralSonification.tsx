@@ -163,14 +163,14 @@ export function SpectralSonification({
   const sortedLines = [...lines].sort((a, b) => a.wavelength - b.wavelength);
 
   return (
-    <div className="flex flex-col gap-4 w-full">
-      <div className="flex items-center justify-between">
-        <span className={`text-3xl font-black font-mono ${textClass}`}>
+    <div className="flex flex-col gap-3 sm:gap-4 w-full">
+      <div className="flex items-center justify-between gap-3">
+        <span className={`text-2xl sm:text-3xl font-black font-mono ${textClass}`}>
           {symbol}
         </span>
         <button
           onClick={playAllLines}
-          className={`px-4 py-2 font-mono text-xs uppercase tracking-wider border transition-all ${
+          className={`px-3 sm:px-4 py-1.5 sm:py-2 font-mono text-[10px] sm:text-xs uppercase tracking-wider border transition-all flex-shrink-0 ${
             isPlaying
               ? "bg-red-950/60 border-red-800 text-red-400 hover:bg-red-900/60"
               : "bg-zinc-900 border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:border-zinc-600"
@@ -180,7 +180,7 @@ export function SpectralSonification({
         </button>
       </div>
 
-      <div className="relative w-full h-36 md:h-44 flex items-end gap-[2px] p-2 border border-zinc-900 bg-black overflow-hidden">
+      <div className="relative w-full h-28 sm:h-36 md:h-44 flex items-end gap-[1px] sm:gap-[2px] p-1.5 sm:p-2 border border-zinc-900 bg-black overflow-hidden">
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -196,7 +196,7 @@ export function SpectralSonification({
           return (
             <div
               key={`${line.wavelength}-${i}`}
-              className="flex-1 relative cursor-pointer group z-10"
+              className="flex-1 relative cursor-pointer group z-10 min-w-0"
               style={{ height: `${line.intensity * 100}%` }}
               onClick={() => playSingle(line, originalIndex)}
             >
@@ -211,7 +211,7 @@ export function SpectralSonification({
                     : "none",
                 }}
               />
-              <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900 border border-zinc-700 px-1.5 py-0.5 text-[8px] font-mono text-zinc-300 whitespace-nowrap z-20 pointer-events-none">
+              <div className="hidden sm:block absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900 border border-zinc-700 px-1.5 py-0.5 text-[8px] font-mono text-zinc-300 whitespace-nowrap z-20 pointer-events-none">
                 {line.wavelength.toFixed(0)} nm
               </div>
             </div>
@@ -221,7 +221,7 @@ export function SpectralSonification({
         <div className="absolute bottom-0 left-0 right-0 h-px bg-zinc-800" />
       </div>
 
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1.5 sm:gap-2">
         {sortedLines.map((line, i) => {
           const color = wavelengthToRGB(line.wavelength);
           const originalIndex = lines.indexOf(line);
@@ -230,15 +230,15 @@ export function SpectralSonification({
             <button
               key={`${line.wavelength}-${i}`}
               onClick={() => playSingle(line, originalIndex)}
-              className={`flex flex-col gap-1 p-2 border transition-all text-left ${
+              className={`flex flex-col gap-0.5 sm:gap-1 p-1.5 sm:p-2 border transition-all text-left ${
                 isActive
                   ? "border-zinc-500 bg-zinc-800/60 scale-[1.02]"
                   : "border-zinc-900 bg-zinc-950/40 hover:border-zinc-700"
               }`}
             >
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
                 <div
-                  className="w-2 h-2 rounded-full flex-shrink-0"
+                  className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full flex-shrink-0"
                   style={{
                     backgroundColor: color,
                     boxShadow: isActive
@@ -246,19 +246,19 @@ export function SpectralSonification({
                       : "none",
                   }}
                 />
-                <span className="text-[10px] font-mono text-zinc-400 truncate">
+                <span className="text-[8px] sm:text-[10px] font-mono text-zinc-400 truncate">
                   {line.label}
                 </span>
               </div>
-              <div className="flex justify-between items-baseline">
-                <span className="text-xs font-mono text-zinc-200">
-                  {line.wavelength.toFixed(1)} nm
+              <div className="flex justify-between items-baseline gap-1">
+                <span className="text-[10px] sm:text-xs font-mono text-zinc-200">
+                  {line.wavelength.toFixed(0)} nm
                 </span>
-                <span className="text-[9px] font-mono text-zinc-500">
+                <span className="text-[8px] sm:text-[9px] font-mono text-zinc-500 flex-shrink-0">
                   {wavelengthToMidiNote(line.wavelength)}
                 </span>
               </div>
-              <div className="w-full h-1 bg-zinc-900 rounded-full overflow-hidden">
+              <div className="w-full h-0.5 sm:h-1 bg-zinc-900 rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full"
                   style={{
@@ -272,20 +272,20 @@ export function SpectralSonification({
         })}
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mt-1">
-        <div className="p-3 border border-zinc-900 bg-zinc-950/40">
-          <span className="text-[9px] uppercase tracking-wider font-mono text-zinc-500 block mb-1">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 mt-1">
+        <div className="p-2 sm:p-3 border border-zinc-900 bg-zinc-950/40">
+          <span className="text-[8px] sm:text-[9px] uppercase tracking-wider font-mono text-zinc-500 block mb-0.5 sm:mb-1">
             Range
           </span>
-          <span className="text-xs font-mono text-zinc-200">
+          <span className="text-[10px] sm:text-xs font-mono text-zinc-200">
             {sortedLines[0].wavelength.toFixed(0)}–{sortedLines[sortedLines.length - 1].wavelength.toFixed(0)} nm
           </span>
         </div>
-        <div className="p-3 border border-zinc-900 bg-zinc-950/40">
-          <span className="text-[9px] uppercase tracking-wider font-mono text-zinc-500 block mb-1">
+        <div className="p-2 sm:p-3 border border-zinc-900 bg-zinc-950/40">
+          <span className="text-[8px] sm:text-[9px] uppercase tracking-wider font-mono text-zinc-500 block mb-0.5 sm:mb-1">
             Audio Range
           </span>
-          <span className="text-xs font-mono text-zinc-200">
+          <span className="text-[10px] sm:text-xs font-mono text-zinc-200">
             {frequencyToAudioFreq(
               wavelengthToFrequency(sortedLines[0].wavelength),
             ).toFixed(0)}–{frequencyToAudioFreq(
@@ -293,11 +293,11 @@ export function SpectralSonification({
             ).toFixed(0)} Hz
           </span>
         </div>
-        <div className="p-3 border border-zinc-900 bg-zinc-950/40">
-          <span className="text-[9px] uppercase tracking-wider font-mono text-zinc-500 block mb-1">
+        <div className="p-2 sm:p-3 border border-zinc-900 bg-zinc-950/40">
+          <span className="text-[8px] sm:text-[9px] uppercase tracking-wider font-mono text-zinc-500 block mb-0.5 sm:mb-1">
             Lines
           </span>
-          <span className="text-xs font-mono text-zinc-200">
+          <span className="text-[10px] sm:text-xs font-mono text-zinc-200">
             {lines.length} emission
           </span>
         </div>

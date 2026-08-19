@@ -48,76 +48,76 @@ export default async function ElementBrief({
   const waveFunctionMath = WAVE_FUNCTIONS[element.id] || oganessonFallbackMath;
 
   return (
-    <div className="min-h-screen bg-black text-zinc-100 font-sans p-6 md:p-12 selection:bg-white selection:text-black">
-      <main className="max-w-6xl mx-auto flex flex-col gap-12">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pt-4">
+    <div className="min-h-screen bg-black text-zinc-100 font-sans px-4 py-6 sm:p-6 md:p-12 selection:bg-white selection:text-black">
+      <main className="max-w-6xl mx-auto flex flex-col gap-8 md:gap-12">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 sm:gap-6 pt-2 md:pt-4">
           <div>
-            <div className="flex items-baseline gap-4 mb-2">
+            <div className="flex items-baseline gap-3 sm:gap-4 mb-1 sm:mb-2">
               <span
-                className={`text-8xl md:text-9xl font-black lexend-900 tracking-tighter leading-none ${textClass}`}
+                className={`text-7xl sm:text-8xl md:text-9xl font-black lexend-900 tracking-tighter leading-none ${textClass}`}
               >
                 {element.symbol}
               </span>
-              <span className="text-2xl md:text-3xl lexend-300 text-zinc-600 font-light">
+              <span className="text-xl sm:text-2xl md:text-3xl lexend-300 text-zinc-600 font-light">
                 #{element.id.toString().padStart(3, "0")}
               </span>
             </div>
 
             <h1
-              className={`text-4xl md:text-6xl font-bold tracking-tight lexend-700 ${textClass}`}
+              className={`text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight lexend-700 ${textClass}`}
             >
               {element.name}
             </h1>
 
-            <p className="text-xs uppercase tracking-[0.3em] font-mono text-zinc-500 lexend-600 mt-2">
+            <p className="text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] font-mono text-zinc-500 lexend-600 mt-1 sm:mt-2">
               {element.category}
             </p>
           </div>
 
-          <div className="text-left md:text-right font-mono">
+          <div className="text-left sm:text-right font-mono">
             <span className="text-[10px] uppercase tracking-widest lexend-100 text-zinc-600 block">
               Atomic Weight
             </span>
-            <span className="text-3xl font-light text-zinc-200">
+            <span className="text-2xl sm:text-3xl font-light text-zinc-200">
               {element.atomicMass}{" "}
               <span className="text-xs text-zinc-500">u</span>
             </span>
           </div>
         </header>
 
-        <section className="relative w-full aspect-video md:aspect-21/9  overflow-hidden group">
+        <section className="relative w-full aspect-video md:aspect-21/9 overflow-hidden group">
           <img
             src={displayImage}
             alt={element.name}
             className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700 ease-out"
           />
-          <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent opacity-90" />
+          <div className="absolute inset-0 bg-linear-to-t from-black via-black/20 to-transparent opacity-90" />
 
-          <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
-            <p className="text-sm md:text-base text-zinc-300 max-w-2xl font-light line-clamp-2 drop-shadow-md">
+          <div className="absolute bottom-3 left-3 right-3 sm:bottom-6 sm:left-6 sm:right-6 flex flex-col sm:flex-row justify-between sm:items-end gap-2 sm:gap-4">
+            <p className="text-xs sm:text-sm md:text-base text-zinc-300 max-w-2xl font-light line-clamp-2 drop-shadow-md">
               {element.desc}
             </p>
-            <div className="hidden sm:flex gap-4 font-mono text-xs lexend-200 text-zinc-400 bg-black/80 backdrop-blur-md px-4 py-2 border border-zinc-800">
-              <span>Disc: {element.discoveredBy}</span>
-              <span>•</span>
+            <div className="hidden sm:flex gap-4 font-mono text-xs lexend-200 text-zinc-400 bg-black/80 backdrop-blur-md px-4 py-2 border border-zinc-800 flex-shrink-0">
+              <span className="truncate">Disc: {element.discoveredBy}</span>
+              <span>·</span>
               <span>{element.discoveryYear}</span>
             </div>
           </div>
         </section>
 
         {/* 3. ELECTRON CONFIGURATION DISPLAY */}
-        <section className="p-6 md:p-8">
-          <h3 className="text-[10px] uppercase tracking-[0.3em] lexend-500 text-zinc-500 mb-6 font-mono">
+        <section className="p-4 sm:p-6 md:p-8">
+          <h3 className="text-[10px] uppercase tracking-[0.3em] lexend-500 text-zinc-500 mb-4 sm:mb-6 font-mono">
             Electron Shell Structure
           </h3>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             {element.electronConfiguration.split(" ").map((shell, idx) => {
               const isCore = shell.includes("[");
               return (
                 <div
                   key={idx}
-                  className={`px-5 py-3 font-mono text-xl border transition-all ${
+                  className={`px-3 sm:px-5 py-2 sm:py-3 font-mono text-sm sm:text-xl border transition-all ${
                     isCore
                       ? "border-zinc-800 bg-zinc-900 text-zinc-400"
                       : `border-transparent ${bgClass} text-black font-bold shadow-[0_0_20px_rgba(255,255,255,0.1)]`
@@ -131,9 +131,9 @@ export default async function ElementBrief({
         </section>
 
         {/* 4. QUANTUM WAVE FUNCTION & GLOWING ORBITAL VISUALIZER */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-6 md:p-10 bg-black">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center p-4 sm:p-6 md:p-10 bg-black">
           {/* Quantum Visualizer (Gradient) */}
-          <div className="lg:col-span-5 flex justify-center items-center py-6 border-b lg:border-b-0 lg:border-r border-zinc-900">
+          <div className="lg:col-span-5 flex justify-center items-center py-4 sm:py-6 border-b lg:border-b-0 lg:border-r border-zinc-900">
             <Orbital3D
               bgClass={bgClass}
               config={element.electronConfiguration}
@@ -146,10 +146,10 @@ export default async function ElementBrief({
             <span className="text-[10px] uppercase tracking-[0.3em] font-mono lexend-500 text-zinc-500 mb-2">
               Quantum State Density
             </span>
-            <div className="text-zinc-100 overflow-x-auto py-4 my-2">
+            <div className="text-zinc-100 overflow-x-auto py-2 sm:py-4 my-1 sm:my-2 -mx-2 px-2">
               <BlockMath math={waveFunctionMath} />
             </div>
-            <p className="text-xs md:text-sm text-zinc-400 font-light leading-relaxed">
+            <p className="text-xs sm:text-sm text-zinc-400 font-light leading-relaxed">
               Calculated probability matrix <InlineMath math="|\Psi|^2" />{" "}
               defining orbital density shell distribution for{" "}
               <span className={textClass}>{element.name}</span>.
@@ -159,8 +159,8 @@ export default async function ElementBrief({
 
         {/* 4b. INTERACTIVE 3D CRYSTAL LATTICE VIEWER */}
         {CRYSTAL_DATA[element.id] && (
-          <section className="p-6 md:p-10 bg-black border border-zinc-900">
-            <span className="text-[10px] uppercase tracking-[0.3em] font-mono lexend-500 text-zinc-500 mb-6 block">
+          <section className="p-4 sm:p-6 md:p-10 bg-black border border-zinc-900">
+            <span className="text-[10px] uppercase tracking-[0.3em] font-mono lexend-500 text-zinc-500 mb-4 sm:mb-6 block">
               Crystal Lattice Structure
             </span>
             <CrystalLatticeViewer
@@ -198,7 +198,7 @@ export default async function ElementBrief({
           />
         </section>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 border-t border-zinc-900 pt-8">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-x-8 sm:gap-x-12 gap-y-0 border-t border-zinc-900 pt-6 md:pt-8">
           <DataRow label="Atomic Radius" value={`${element.atomicRadius} pm`} />
           <DataRow label="Ionization Energy" value={element.ionizationEnergy} />
           <DataRow label="Electron Affinity" value={element.electronAffinity} />
@@ -207,7 +207,7 @@ export default async function ElementBrief({
           <DataRow label="Reactivity" value={element.reactivity} />
 
           {/* Advanced Visual Components */}
-          <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-12 mt-2 items-end">
+          <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-8 sm:gap-x-12 mt-2 items-end">
             <OxidationBadges states={element.oxidationStates} />
             <PhIndicator behavior={element.acidBaseBehavior} />
           </div>
@@ -221,8 +221,8 @@ export default async function ElementBrief({
 
         {/* 6. SPECTRAL LINE SONIFICATION */}
         {SPECTRAL_DATA[element.id] && (
-          <section className="p-6 md:p-10 bg-black border border-zinc-900">
-            <span className="text-[10px] uppercase tracking-[0.3em] font-mono lexend-500 text-zinc-500 mb-6 block">
+          <section className="p-4 sm:p-6 md:p-10 bg-black border border-zinc-900">
+            <span className="text-[10px] uppercase tracking-[0.3em] font-mono lexend-500 text-zinc-500 mb-4 sm:mb-6 block">
               Emission Spectrum &amp; Quantum Audio
             </span>
             <SpectralSonification
@@ -267,17 +267,17 @@ function MetricCard({
   textClass: string;
 }) {
   return (
-    <div className="p-5 border border-zinc-900 bg-zinc-950/40 flex flex-col justify-between">
-      <span className="text-[10px] uppercase tracking-wider lexend-500 text-zinc-500 font-mono mb-4 block">
+    <div className="p-3 sm:p-5 border border-zinc-900 bg-zinc-950/40 flex flex-col justify-between">
+      <span className="text-[9px] sm:text-[10px] uppercase tracking-wider lexend-500 text-zinc-500 font-mono mb-2 sm:mb-4 block">
         {label}
       </span>
       <div>
         <span
-          className={`text-2xl md:text-3xl font-light font-mono ${textClass}`}
+          className={`text-xl sm:text-2xl md:text-3xl font-light font-mono ${textClass}`}
         >
           {value}
         </span>
-        <span className="text-xs text-zinc-600 font-mono ml-2">{unit}</span>
+        <span className="text-[10px] sm:text-xs text-zinc-600 font-mono ml-1 sm:ml-2">{unit}</span>
       </div>
     </div>
   );
@@ -286,11 +286,13 @@ function MetricCard({
 // Minimal Clean Data Row
 function DataRow({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="flex justify-between items-center py-3 border-b border-zinc-900 font-mono">
-      <span className="text-xs uppercase tracking-wider lexend-500 text-zinc-500">
+    <div className="flex justify-between items-center gap-4 py-3 border-b border-zinc-900 font-mono">
+      <span className="text-[10px] sm:text-xs uppercase tracking-wider lexend-500 text-zinc-500 flex-shrink-0">
         {label}
       </span>
-      <span className="text-sm text-zinc-200">{value}</span>
+      <span className="text-xs sm:text-sm text-zinc-200 text-right truncate min-w-0">
+        {value}
+      </span>
     </div>
   );
 }
@@ -317,28 +319,28 @@ function PhIndicator({ behavior }: { behavior: string }) {
   ];
 
   return (
-    <div className="flex flex-col gap-3 py-3 border-b border-zinc-900 font-mono">
-      <div className="flex justify-between items-center text-xs lexend-400 tracking-wider text-zinc-500">
+    <div className="flex flex-col gap-2 sm:gap-3 py-3 border-b border-zinc-900 font-mono">
+      <div className="flex justify-between items-center text-[10px] sm:text-xs lexend-400 tracking-wider text-zinc-500">
         <span>Nature</span>
-        <span className="text-sm text-zinc-100 lexend-400">{label}</span>
+        <span className="text-xs sm:text-sm text-zinc-100 lexend-400">{label}</span>
       </div>
 
-      <div className="grid grid-cols-5 gap-1.5 mt-1">
+      <div className="grid grid-cols-5 gap-1 sm:gap-1.5 mt-1">
         {zones.map((zone) => {
           const isActive = zone.key === activeZone;
           return (
             <div
               key={zone.key}
-              className={`flex flex-col items-center justify-center p-2 rounded-sm border text-center transition-all ${
+              className={`flex flex-col items-center justify-center p-1 sm:p-2 rounded-sm border text-center transition-all ${
                 isActive
                   ? `${zone.color} shadow-[0_0_12px_rgba(255,255,255,0.1)] font-bold scale-[1.02]`
                   : "border-zinc-800/80 bg-zinc-950/40 text-zinc-700 opacity-30"
               }`}
             >
-              <span className="text-[9px] lexend-300 tracking-tighter leading-tight">
+              <span className="text-[7px] sm:text-[9px] lexend-300 tracking-tighter leading-tight">
                 {zone.label}
               </span>
-              <span className="text-[8px] mt-1 text-zinc-500 lexend-400">pH {zone.ph}</span>
+              <span className="text-[6px] sm:text-[8px] mt-0.5 sm:mt-1 text-zinc-500 lexend-400">pH {zone.ph}</span>
             </div>
           );
         })}
@@ -424,13 +426,13 @@ function StateOfMatterGauge({
   const rtPercent = Math.min((ROOM_TEMP / maxTemp) * 100, 100);
 
   return (
-    <div className="flex flex-col gap-3 py-3 border-b border-zinc-900 font-mono md:col-span-2 mt-2">
-      <div className="flex justify-between items-center text-xs uppercase tracking-wider lexend-500 text-zinc-500">
+    <div className="flex flex-col gap-2 sm:gap-3 py-3 border-b border-zinc-900 font-mono md:col-span-2 mt-2">
+      <div className="flex justify-between items-center text-[10px] sm:text-xs uppercase tracking-wider lexend-500 text-zinc-500">
         <span>State of Matter (298 K)</span>
-        <span className={`text-sm font-bold lexend-800 ${stateColor}`}>{state}</span>
+        <span className={`text-xs sm:text-sm font-bold lexend-800 ${stateColor}`}>{state}</span>
       </div>
 
-      <div className="relative h-2 w-full bg-zinc-950 rounded-full mt-4 flex overflow-hidden border border-zinc-800">
+      <div className="relative h-2 w-full bg-zinc-950 rounded-full mt-2 sm:mt-4 flex overflow-hidden border border-zinc-800">
         {/* Solid Phase Bar */}
         <div
           className="h-full bg-zinc-700/50 transition-all"
@@ -457,18 +459,18 @@ function StateOfMatterGauge({
         />
       </div>
 
-      <div className="relative w-full h-4 text-[9px] text-zinc-600">
+      <div className="relative w-full h-4 text-[8px] sm:text-[9px] text-zinc-600">
         <span
           className="absolute -translate-x-1/2"
           style={{ left: `${mpPercent}%` }}
         >
-          MP: {meltingPoint}K
+          {meltingPoint}K
         </span>
         <span
           className="absolute -translate-x-1/2"
           style={{ left: `${bpPercent}%` }}
         >
-          BP: {boilingPoint}K
+          {boilingPoint}K
         </span>
       </div>
     </div>

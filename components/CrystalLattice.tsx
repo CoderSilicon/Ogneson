@@ -277,8 +277,8 @@ export function CrystalLatticeViewer({
   const vectors = useMemo(() => latticeVectors(params), [params]);
 
   return (
-    <div className="flex flex-col gap-4 w-full">
-      <div className="w-full h-72 md:h-80 relative cursor-grab active:cursor-grabbing border border-zinc-900 bg-zinc-950/60">
+    <div className="flex flex-col gap-3 sm:gap-4 w-full">
+      <div className="w-full h-56 sm:h-72 md:h-80 relative cursor-grab active:cursor-grabbing border border-zinc-900 bg-zinc-950/60">
         <Canvas camera={{ position: [4, 3, 4], fov: 40 }}>
           <ambientLight intensity={0.5} />
           <pointLight position={[10, 10, 10]} intensity={0.7} />
@@ -300,47 +300,47 @@ export function CrystalLatticeViewer({
 
         <button
           onClick={() => setShowCell((p) => !p)}
-          className="absolute top-3 right-3 px-3 py-1.5 bg-zinc-800/80 backdrop-blur-sm border border-zinc-700 text-zinc-300 text-[10px] font-mono uppercase tracking-wider hover:bg-zinc-700/80 transition-colors z-10"
+          className="absolute top-2 right-2 sm:top-3 sm:right-3 px-2 sm:px-3 py-1 sm:py-1.5 bg-zinc-800/80 backdrop-blur-sm border border-zinc-700 text-zinc-300 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider hover:bg-zinc-700/80 transition-colors z-10"
         >
           {showCell ? "Hide" : "Show"} Unit Cell
         </button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        <div className="flex flex-col gap-1 p-3 border border-zinc-900 bg-zinc-950/40">
-          <span className="text-[9px] uppercase tracking-wider font-mono text-zinc-500">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
+        <div className="flex flex-col gap-0.5 sm:gap-1 p-2 sm:p-3 border border-zinc-900 bg-zinc-950/40">
+          <span className="text-[8px] sm:text-[9px] uppercase tracking-wider font-mono text-zinc-500">
             Structure
           </span>
-          <span className={`text-sm font-mono font-bold ${textClass}`}>
+          <span className={`text-xs sm:text-sm font-mono font-bold ${textClass} truncate`}>
             {params.label}
           </span>
         </div>
-        <div className="flex flex-col gap-1 p-3 border border-zinc-900 bg-zinc-950/40">
-          <span className="text-[9px] uppercase tracking-wider font-mono text-zinc-500">
+        <div className="flex flex-col gap-0.5 sm:gap-1 p-2 sm:p-3 border border-zinc-900 bg-zinc-950/40">
+          <span className="text-[8px] sm:text-[9px] uppercase tracking-wider font-mono text-zinc-500">
             Lattice Constants
           </span>
-          <span className="text-sm font-mono text-zinc-200">
-            a={params.a.toFixed(2)}{" "}
-            {params.type === "fcc" || params.type === "bcc" || params.type === "diamond" || params.type === "simple-cubic"
-              ? ""
-              : `b=${params.b.toFixed(2)} c=${params.c.toFixed(2)}`}
+          <span className="text-[11px] sm:text-sm font-mono text-zinc-200 truncate">
+            a={params.a.toFixed(2)}
+            {params.type !== "fcc" && params.type !== "bcc" && params.type !== "diamond" && params.type !== "simple-cubic"
+              ? ` b=${params.b.toFixed(2)} c=${params.c.toFixed(2)}`
+              : ""}
           </span>
         </div>
-        <div className="flex flex-col gap-1 p-3 border border-zinc-900 bg-zinc-950/40">
-          <span className="text-[9px] uppercase tracking-wider font-mono text-zinc-500">
+        <div className="flex flex-col gap-0.5 sm:gap-1 p-2 sm:p-3 border border-zinc-900 bg-zinc-950/40">
+          <span className="text-[8px] sm:text-[9px] uppercase tracking-wider font-mono text-zinc-500">
             Angles
           </span>
-          <span className="text-sm font-mono text-zinc-200">
+          <span className="text-[11px] sm:text-sm font-mono text-zinc-200 truncate">
             {params.alpha === params.beta && params.beta === params.gamma
               ? `α=β=γ=${params.alpha}°`
               : `α=${params.alpha}° β=${params.beta}° γ=${params.gamma}°`}
           </span>
         </div>
-        <div className="flex flex-col gap-1 p-3 border border-zinc-900 bg-zinc-950/40">
-          <span className="text-[9px] uppercase tracking-wider font-mono text-zinc-500">
-            Coordination Number
+        <div className="flex flex-col gap-0.5 sm:gap-1 p-2 sm:p-3 border border-zinc-900 bg-zinc-950/40">
+          <span className="text-[8px] sm:text-[9px] uppercase tracking-wider font-mono text-zinc-500">
+            Coord. Number
           </span>
-          <span className="text-sm font-mono text-zinc-200">
+          <span className="text-[11px] sm:text-sm font-mono text-zinc-200">
             {params.type === "fcc"
               ? "12"
               : params.type === "bcc"
@@ -354,11 +354,11 @@ export function CrystalLatticeViewer({
                       : "—"}
           </span>
         </div>
-        <div className="flex flex-col gap-1 p-3 border border-zinc-900 bg-zinc-950/40 col-span-2 md:col-span-1">
-          <span className="text-[9px] uppercase tracking-wider font-mono text-zinc-500">
-            Atoms per Unit Cell
+        <div className="flex flex-col gap-0.5 sm:gap-1 p-2 sm:p-3 border border-zinc-900 bg-zinc-950/40 col-span-2 md:col-span-1">
+          <span className="text-[8px] sm:text-[9px] uppercase tracking-wider font-mono text-zinc-500">
+            Atoms / Cell
           </span>
-          <span className="text-sm font-mono text-zinc-200">
+          <span className="text-[11px] sm:text-sm font-mono text-zinc-200">
             {params.type === "fcc"
               ? "4"
               : params.type === "bcc"
@@ -374,15 +374,15 @@ export function CrystalLatticeViewer({
                         : "—"}
           </span>
         </div>
-        <div className="flex flex-col gap-1 p-3 border border-zinc-900 bg-zinc-950/40">
-          <span className="text-[9px] uppercase tracking-wider font-mono text-zinc-500">
-            Atomic Packing Factor
+        <div className="flex flex-col gap-0.5 sm:gap-1 p-2 sm:p-3 border border-zinc-900 bg-zinc-950/40">
+          <span className="text-[8px] sm:text-[9px] uppercase tracking-wider font-mono text-zinc-500">
+            Packing Factor
           </span>
-          <div className="flex items-end gap-2">
-            <span className={`text-xl font-mono font-bold ${textClass}`}>
+          <div className="flex items-end gap-1.5 sm:gap-2">
+            <span className={`text-base sm:text-xl font-mono font-bold ${textClass}`}>
               {params.apf.toFixed(2)}
             </span>
-            <div className="flex-1 h-2 bg-zinc-900 rounded-full overflow-hidden mb-1">
+            <div className="flex-1 h-1.5 sm:h-2 bg-zinc-900 rounded-full overflow-hidden mb-0.5 sm:mb-1">
               <div
                 className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-500"
                 style={{ width: `${params.apf * 100}%` }}
