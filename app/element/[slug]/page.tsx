@@ -1,10 +1,12 @@
-import { PeriodicData, WAVE_FUNCTIONS, CRYSTAL_DATA, SPECTRAL_DATA } from "@/data/elementData";
+import { PeriodicData, WAVE_FUNCTIONS, CRYSTAL_DATA, SPECTRAL_DATA, computeNuclearData, electronConfigToLatex } from "@/data/elementData";
 import { CATEGORY_COLORS, TEXT_COLOR_MAP } from "@/data/elements";
 import { BlockMath, InlineMath } from "react-katex";
 import "katex/dist/katex.min.css";
+import { ExpandableText } from "@/components/ExpandableText";
 import { Orbital3D } from "@/components/OrbitalGlow";
 import { CrystalLatticeViewer } from "@/components/CrystalLattice";
 import { SpectralSonification } from "@/components/SpectralSonification";
+import { NuclearSection } from "@/components/NuclearSection";
 
 export default async function ElementBrief({
   params,
@@ -46,6 +48,8 @@ export default async function ElementBrief({
     typeof element.image === "string" ? element.image : imageFallback;
   const oganessonFallbackMath = `\\Psi_{Og} \\approx \\frac{1}{\\sqrt{N!}} \\det \\left| \\chi_1(\\mathbf{r}_1) \\dots \\chi_N(\\mathbf{r}_N) \\right|`;
   const waveFunctionMath = WAVE_FUNCTIONS[element.id] || oganessonFallbackMath;
+  const nuclearData = computeNuclearData(element);
+  const electronConfigLatex = electronConfigToLatex(element.electronConfiguration);
 
   return (
     <div className="min-h-screen bg-black text-zinc-100 font-sans px-4 py-6 sm:p-6 md:p-12 selection:bg-white selection:text-black">
@@ -93,10 +97,12 @@ export default async function ElementBrief({
           />
           <div className="absolute inset-0 bg-linear-to-t from-black via-black/20 to-transparent opacity-90" />
 
-          <div className="absolute bottom-3 left-3 right-3 sm:bottom-6 sm:left-6 sm:right-6 flex flex-col sm:flex-row justify-between sm:items-end gap-2 sm:gap-4">
-            <p className="text-xs sm:text-sm md:text-base text-zinc-300 max-w-2xl font-light line-clamp-2 drop-shadow-md">
-              {element.desc}
-            </p>
+          <div className="absolute bottom-3 left-3 right-3 sm:bottom-6 sm:left-6 sm:right-6 flex flex-col sm:flex-row justify-between sm:items-end gap-2 sm:gap-4 z-2">
+            <ExpandableText
+              text={element.desc}
+              className="max-w-2xl"
+              clampLines={2}
+            />
             <div className="hidden sm:flex gap-4 font-mono text-xs lexend-200 text-zinc-400 bg-black/80 backdrop-blur-md px-4 py-2 border border-zinc-800 shrink-0">
               <span className="truncate">Disc: {element.discoveredBy}</span>
               <span>·</span>
@@ -108,25 +114,28 @@ export default async function ElementBrief({
         {/* 3. ELECTRON CONFIGURATION DISPLAY */}
         <section className="p-4 sm:p-6 md:p-8">
           <h3 className="text-[10px] uppercase tracking-[0.3em] lexend-500 text-zinc-500 mb-4 sm:mb-6 font-mono">
-            Electron Shell Structure
+            Electron Configuration
           </h3>
 
-          <div className="flex flex-wrap gap-2 sm:gap-3">
-            {element.electronConfiguration.split(" ").map((shell, idx) => {
-              const isCore = shell.includes("[");
-              return (
-                <div
-                  key={idx}
-                  className={`px-3 sm:px-5 py-2 sm:py-3 font-mono text-sm sm:text-xl border transition-all ${
-                    isCore
-                      ? "border-zinc-800 bg-zinc-900 text-zinc-400"
-                      : `border-transparent ${bgClass} text-black font-bold shadow-[0_0_20px_rgba(255,255,255,0.1)]`
-                  }`}
-                >
-                  {shell}
-                </div>
-              );
-            })}
+          <div className="overflow-x-auto py-2">
+            <div className="text-lg sm:text-xl md:text-2xl inline-block">
+              <BlockMath math={electronConfigLatex} />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3 sm:gap-4 mt-4 text-[10px] sm:text-xs font-mono text-zinc-500">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" /> s-orbital
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-500/80" /> p-orbital
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-green-500/80" /> d-orbital
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-purple-500/80" /> f-orbital
+            </span>
           </div>
         </section>
 
@@ -144,7 +153,7 @@ export default async function ElementBrief({
           {/* Equation & Description */}
           <div className="lg:col-span-7 flex flex-col justify-center lg:pl-4">
             <span className="text-[10px] uppercase tracking-[0.3em] font-mono lexend-500 text-zinc-500 mb-2">
-              Quantum State Density
+              State Density
             </span>
             <div className="text-zinc-100 overflow-x-auto py-2 sm:py-4 my-1 sm:my-2 -mx-2 px-2">
               <BlockMath math={waveFunctionMath} />
@@ -161,7 +170,7 @@ export default async function ElementBrief({
         {CRYSTAL_DATA[element.id] && (
           <section className="p-4 sm:p-6 md:p-10 bg-black border border-zinc-900">
             <span className="text-[10px] uppercase tracking-[0.3em] font-mono lexend-500 text-zinc-500 mb-4 sm:mb-6 block">
-              Crystal Lattice Structure
+              Crystal Structure
             </span>
             <CrystalLatticeViewer
               params={CRYSTAL_DATA[element.id]}
@@ -223,7 +232,7 @@ export default async function ElementBrief({
         {SPECTRAL_DATA[element.id] && (
           <section className="p-4 sm:p-6 md:p-10 bg-black border border-zinc-900">
             <span className="text-[10px] uppercase tracking-[0.3em] font-mono lexend-500 text-zinc-500 mb-4 sm:mb-6 block">
-              Emission Spectrum &amp; Quantum Audio
+              Emission Spectrum
             </span>
             <SpectralSonification
               lines={SPECTRAL_DATA[element.id]}
@@ -233,22 +242,22 @@ export default async function ElementBrief({
           </section>
         )}
 
-        {/* 7. ISOTOPES FOOTER */}
-        <footer className="pt-4 pb-12">
-          <span className="text-[10px] uppercase tracking-[0.3em] lexend-400 text-zinc-600 block mb-4">
-            Isotope Signatures
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {element.isotopes.map((iso) => (
-              <span
-                key={iso}
-                className="px-3 py-1.5 bg-zinc-950 text-zinc-400 text-xs lexend-300 border border-zinc-900 hover:border-zinc-700 transition-colors"
-              >
-                {iso}
-              </span>
-            ))}
-          </div>
-        </footer>
+        {/* 7. NUCLEAR SCIENCE DATA */}
+        <NuclearSection
+          data={{
+            Z: element.id,
+            A: Math.round(element.atomicMass),
+            neutrons: nuclearData.neutrons,
+            isodiapher: nuclearData.isodiapher,
+            isobars: nuclearData.isobars,
+            isotones: nuclearData.isotones,
+            isotopes: element.isotopes,
+            crystalStructure: element.crystalStructure,
+            allotropes: nuclearData.allotropes,
+            isosteres: nuclearData.isosteres,
+          }}
+          textClass={textClass}
+        />
       </main>
     </div>
   );
@@ -428,7 +437,7 @@ function StateOfMatterGauge({
   return (
     <div className="flex flex-col gap-2 sm:gap-3 py-3 border-b border-zinc-900 font-mono md:col-span-2 mt-2">
       <div className="flex justify-between items-center text-[10px] sm:text-xs uppercase tracking-wider lexend-500 text-zinc-500">
-        <span>State of Matter (298 K)</span>
+        <span>State of Matter</span>
         <span className={`text-xs sm:text-sm font-bold lexend-800 ${stateColor}`}>{state}</span>
       </div>
 
