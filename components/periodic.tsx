@@ -40,9 +40,9 @@ function ElementCard({ element, colorClass, isDimmed }: ElementCardProps) {
 
         {/* Top Row: Atomic Number & Shell Stack */}
         <div className="flex justify-between w-full z-10">
-          <span className="text-xs md:text-sm font-medium opacity-90 leading-none lexend-300">
+          {/* <span className="text-xs md:text-sm font-medium opacity-90 leading-none lexend-300">
             {element.number}
-          </span>
+          </span> */}
 
           {element.shells && (
             <div className="flex flex-col items-end gap-0.5">

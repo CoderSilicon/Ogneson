@@ -1,4 +1,4 @@
-export type CrystalLatticeType =
+    export type CrystalLatticeType =
   | "fcc"
   | "bcc"
   | "hcp"
@@ -2285,7 +2285,7 @@ export const PeriodicData: ElementType[] = [
     name: "Tungsten",
     appearance: "Grayish-white metal, lustrous",
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Wolfram_evaporated_crystals_and_1cm3_cube.jpg/250px-Wolfram_evaporated_crystals_and_1cm3_cube.jpg",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5yJ_XsT2kxHmaxNudNqtG8UoggyNZxZOr3iAFGQx2CnC8aqGARma6rcU&s=10",
     discoveryYear: 1783,
     discoveredBy: "Fausto Elhuyar",
     category: "Transition",
@@ -2343,7 +2343,7 @@ export const PeriodicData: ElementType[] = [
     name: "Osmium",
     appearance: "Silvery, blue cast",
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Osmium_crystals.jpg/250px-Osmium_crystals.jpg",
+      "https://iigindia.com/wp-content/uploads/2026/02/Space_Ring_New3.jpg",
     discoveryYear: 1803,
     discoveredBy: "Smithson Tennant",
     category: "Transition",
@@ -4353,10 +4353,10 @@ export function computeNuclearData(element: (typeof PeriodicData)[0]) {
 
   const isotopologues = element.isotopes.length > 1
     ? element.isotopes.map((iso) => {
-        const massNum = parseInt(iso.replace(/[A-Za-z\-\+\[\]\(\)]/g, "")) || A;
-        const neutronCount = massNum - Z;
-        return `${element.symbol}-${neutronCount > 0 ? neutronCount : ""}${element.symbol} (${neutronCount}n difference)`;
-      })
+      const massNum = parseInt(iso.replace(/[A-Za-z\-\+\[\]\(\)]/g, "")) || A;
+      const neutronCount = massNum - Z;
+      return `${element.symbol}-${neutronCount > 0 ? neutronCount : ""}${element.symbol} (${neutronCount}n difference)`;
+    })
     : [];
 
   const isosteres = PeriodicData.filter(

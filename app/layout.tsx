@@ -3,6 +3,7 @@ import "./globals.css";
 import "./fonts.css";
 import icon from "./favicon.ico";
 import "katex/dist/katex.min.css";
+import { ClientShell } from "@/components/ClientShell";
 
 export const metadata: Metadata = {
   title: "Ogneson",
@@ -40,7 +41,9 @@ export default function RootLayout({
   return (
     
     <html lang="en">
-      <body className="antialiased bg-black">{children}</body>
+      <body className="antialiased bg-black">
+        <ClientShell>{children}</ClientShell>
+      </body>
     </html>
   );
 }

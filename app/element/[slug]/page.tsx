@@ -7,6 +7,7 @@ import { Orbital3D } from "@/components/OrbitalGlow";
 import { CrystalLatticeViewer } from "@/components/CrystalLattice";
 import { SpectralSonification } from "@/components/SpectralSonification";
 import { NuclearSection } from "@/components/NuclearSection";
+import { OganessonEasterEgg } from "@/components/OganessonEasterEgg";
 
 export default async function ElementBrief({
   params,
@@ -52,7 +53,8 @@ export default async function ElementBrief({
   const electronConfigLatex = electronConfigToLatex(element.electronConfiguration);
 
   return (
-    <div className="min-h-screen bg-black text-zinc-100 font-sans px-4 py-6 sm:p-6 md:p-12 selection:bg-white selection:text-black">
+    <div className="min-h-screen bg-black text-zinc-100 font-sans px-4 py-6 sm:p-6 md:p-12 selection:bg-white selection:text-black relative">
+      <OganessonEasterEgg elementId={element.id} />
       <main className="max-w-6xl mx-auto flex flex-col gap-8 md:gap-12">
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 sm:gap-6 pt-2 md:pt-4">
           <div>
